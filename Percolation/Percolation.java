@@ -114,7 +114,7 @@ public class Percolation {
         }
 
         // track current site in ufgrid
-        int track = (row - 1) * grid.length + col;
+        int track = twoToOne(row - 1, col);
         // check if the site is connected to the top virtual site
         return ufgrid.find(0) == ufgrid.find(track);
     }
@@ -126,6 +126,11 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
+        // corner case for n = 1
+        if ((grid.length == 1) && !isOpen(1, 1)) {
+            return false;
+        }
+        // check if virtual sites are connected
         return ufgrid.find(0) == ufgrid.find(grid.length * grid.length + 1);
     }
 }

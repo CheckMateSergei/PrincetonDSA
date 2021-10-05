@@ -126,6 +126,11 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
+        // corner case for n = 1
+        if ((grid.length == 1) && !isOpen(1, 1)) {
+            return false;
+        }
+        // check if virtual sites are connected
         return ufgrid.find(0) == ufgrid.find(grid.length * grid.length + 1);
     }
 }
