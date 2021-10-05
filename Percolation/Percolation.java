@@ -9,7 +9,7 @@ public class Percolation {
 
     public int[][] grid;
     public WeightedQuickUnionUF ufgrid;
-    public int openSites = 0;
+    public int openSites;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -22,14 +22,16 @@ public class Percolation {
         int nSquared = n * n;
         // initialize with two extra nodes used as virtual sites
         ufgrid = new WeightedQuickUnionUF(nSquared + 2);
+        // maybe intialize the counter for each object and youll get the right results eh?
+        openSites = 0;
 
         // connect the two virtual sites to the top and bottom rows
         // let the 0th and (n^2 + 1)th nodes be virtual
         for (int i = 1; i < n + 1; i++) {
-            ufgrid.union(i, 0);
+            ufgrid.union(0, i);
         }
-        for (int i = (nSquared - n); i < nSquared + 1; i++) {
-            ufgrid.union(i, nSquared + 1);
+        for (int i = (nSquared + 1 - n); i < nSquared + 1; i++) {
+            ufgrid.union(nSquared + 1, i);
         }
         // initialize the grid
         grid = new int[n][n];
@@ -58,19 +60,19 @@ public class Percolation {
             openSites++;
         }
         // connect to site ABOVE if in bounds and open
-        if (row - 2 <= 0 && isOpen(row - 1, col)) {
+        if (row - 1 > 0 && isOpen(row - 1, col)) {
             int track2 = (row - 2) * grid.length + col;
             // union corresponding entries in ufgrid
             ufgrid.union(track, track2);
         }
         // connect to site BELOW if in bounds and open
-        if (row > grid.length && isOpen(row + 1, col)) {
+        if (row < grid.length && isOpen(row + 1, col)) {
             int track2 = row * grid.length + col;
             // union corresponding entries in ufgrid
             ufgrid.union(track, track2);
         }
         // connect to site to RIGHT if in bounds and open
-        if (col + 1 < grid.length && isOpen(row, col + 1)) {
+        if (col + 1 <= grid.length && isOpen(row, col + 1)) {
             int track2 = (row - 1) * grid.length + col + 1;
             // union corresponding entries in ufgrid
             ufgrid.union(track, track2);
@@ -108,12 +110,14 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        // see if the top and bottom virtual sites are connected
-        return ufgrid.find(0) == ufgrid.find(grid.length * grid.length + 1);
-    }
+        // check if any elements on the bottom row are full
+        // linear time O(n)
+        for (int i = 1; i < grid.length + 1; i++) {
+            if (isFull(grid.length, i)) {
+                return true;
+            }
+        }
 
-    public static void main(String[] args) {
-
-
+        return false;
     }
 }
